@@ -1,0 +1,37 @@
+# macOS
+.DS_Store
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pyo
+*.pdm
+
+# Virtual Environments
+venv/
+env/
+ENV/
+*.env
+*.venv
+*.egg-info/
+.eggs/
+
+# Jupyter Notebook
+.ipynb_checkpoints/
+
+# VS Code
+.vscode/
+
+# Logs and Databases
+*.log
+*.sqlite3
+*.db
+
+# Other IDEs
+.idea/
+*.iml
+
+# Specific Files
+App/expo-env.d.ts
