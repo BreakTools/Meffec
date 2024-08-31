@@ -26,7 +26,8 @@ def get_effect_info() -> dict:
 ```
 
 The controller will send this information to the server, which will then be sent to the app. In the app this script now shows up as:
-[image here]
+![IMG_9884](https://github.com/user-attachments/assets/0b66ea12-48ce-4288-ad12-511b8b257e44)
+
 
 Effects scripts should implement a `run_effect` function, which will be triggered when you press the button in the app:
 
