@@ -10,7 +10,7 @@ Simply put, Meffec is a system specifically designed for realtime show effects t
 ## Why was it made?
 
 I really, really enjoy creating immersive experiences. Be it for D&D or whenever I throw a big halloween party. I also really like having one button for things.
-Just imagine this: _A bossfight is starting. The party has been working up to this point for months. You've been monologuing for minutes and the big fight is about to break out._ The atmoshphere needs to be just right to suit the moment. Do you now want to first use your DMX software to turn the lights to red, then open Spotify to change your tavern music to some fighting music, perhaps open YouTube for some dungeon ambiance and then physically press the button on your smoke machine to create some ambiance? I don't. Existing solutions for this like QLab seemed way too advanced and don't provide the simple flexibily of being able to run any ol' Python script, so I decided to make my own system.
+Just imagine this: _A bossfight is starting. The party has been working up to this point for months. You've been monologuing for minutes and the big fight is about to break out._ The atmoshphere needs to be just right to suit the moment. Do you now want to first use your DMX software to turn the lights to red, then open Spotify to change your tavern music to some fighting music, perhaps open YouTube for some dungeon ambiance and then physically press the button on your smoke machine to create a moody atmosphere? I don't. Existing solutions for this like QLab seemed way too advanced and don't provide the simple flexibily of being able to run any ol' Python script, so I decided to make my own system.
 
 ## How does it work?
 
