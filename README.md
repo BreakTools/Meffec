@@ -59,7 +59,12 @@ def disable_smoke_machine(meffec_classes) -> None:
     )
 ```
 
-`meffec_classes` are passed to the run_effect function, which are multiple classes for making developing show effects as easy as possible. There's support for as many streams of audio as you want, OSC messaging for interfacing with for example DMX software and you can also send data to custom devices across the Meffec network (I've for example modified my dirt cheap smoke machine so it can be triggered with a NodeMCU that's connected to the Meffec server). Scripts are automatically reloaded when you save then, so you can develop your effects without slowing down.
+`meffec_classes` are passed to the run_effect function, which are multiple classes for making developing show effects as easy as possible. There's support for as many streams of audio as you want, OSC messaging for interfacing with for example DMX software and you can also send data to custom devices across the Meffec network (I've for example modified my dirt cheap smoke machine so it can be triggered with a NodeMCU that's connected to the Meffec server). Scripts are automatically reloaded when you save then, so you can develop your effects without slowing down. Combining several scripts together you quickly get a result like this:
+
+https://github.com/user-attachments/assets/02b17e14-7f9c-4798-81af-129c3c31b06f
+
+
+
 
 ## Setting up your Meffec system
 
