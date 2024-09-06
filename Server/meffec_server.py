@@ -240,7 +240,7 @@ async def forward_device_action(device_action: dict) -> None:
     )
 
     for client in server_information.connected_clients:
-        if client.type == data_models.MeffecClientType.DEVICE:
+        if client.type == data_models.MeffecClientType.DEVICE and client.name == device_action["device"]:
             await client.websocket.send(
                 json.dumps(
                     {
