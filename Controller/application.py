@@ -98,6 +98,7 @@ class MeffecController(QtWidgets.QApplication):
         """Runs all the functions to utilize the new settings."""
         self.websocket_handler.websocket.close()
         self.scripts_handler.find_scripts()
+        self.script_available_classes.osc_handler.connect_to_server()
 
     def process_connection_change(self, connected: bool) -> None:
         """Runs the proper functions if the connect status changes.

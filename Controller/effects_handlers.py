@@ -313,13 +313,15 @@ class OSCHandler(QtCore.QObject):
         """Initializes the OSC handler."""
         super().__init__()
         self.connect_to_server()
+        self.osc_connection = None
 
     def connect_to_server(self):
         """Connects to OSC server using the stored settings."""
         settings = QtCore.QSettings()
         server_url = settings.value(
-            data_structures.SettingsKey.OSC_SERVER_URL.value
+            data_structures.SettingsKey.OSC_SERVER_URL.value, "0.0.0.0:2002"
         )
+
         server = server_url.split(":")[0]
         port = server_url.split(":")[1]
         self.osc_connection = SimpleUDPClient(server, int(port))
@@ -331,6 +333,9 @@ class OSCHandler(QtCore.QObject):
             address: The address to send the value to.
             value: The value to send to the address.
         """
+        if not self.osc_connection:
+            return
+
         self.osc_connection.send_message(address, value)
 
 

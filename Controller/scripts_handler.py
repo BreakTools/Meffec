@@ -93,7 +93,7 @@ class ScriptsHandler(QtCore.QObject):
         """
         settings = QtCore.QSettings()
         folder_path = settings.value(
-            data_structures.SettingsKey.EFFECTS_SCRIPTS_FOLDER.value
+            data_structures.SettingsKey.EFFECTS_SCRIPTS_FOLDER.value, ""
         )
         return Path(folder_path)
 
