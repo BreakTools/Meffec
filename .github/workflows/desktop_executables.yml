@@ -57,10 +57,15 @@ jobs:
         run: |
           python -m PyInstaller --onefile --windowed --icon=images/meffec_icon.icns --name=MeffecController application.py --add-data "images:images"
 
-      - name: Upload .app
+      - name: Zip app bundle
+        working-directory: Controller
+        run: |
+          ditto -c -k --sequesterRsrc --keepParent dist/MeffecController.app MeffecControllerMacOS.zip
+
+      - name: Upload zipped app
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ github.event.release.tag_name }}
-          files: /Users/runner/work/Meffec/Meffec/Controller/dist/MeffecController.app
+          files: Controller/MeffecControllerMacOS.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
