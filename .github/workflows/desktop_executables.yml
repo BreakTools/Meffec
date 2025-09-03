@@ -1,0 +1,65 @@
+name: Build executables
+
+on:
+  release:
+    types:
+      - created
+
+permissions:
+  contents: write
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+  
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.12.6
+
+      - name: Install dependencies
+        working-directory: Controller
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Build .EXE
+        run: |
+          python -m PyInstaller --onefile --windowed --icon=images/meffec_icon.ico --name=MeffecController application.py --add-data="images:images"
+
+      - name: Upload .EXE
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.event.release.tag_name }}
+          files: Controller/dist/MeffecController.exe
+          
+  macos:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12.6'
+
+      - name: Install dependencies
+        working-directory: Controller
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Build .app
+        working-directory: Controller
+        run: |
+          python -m PyInstaller --onefile --windowed --icon=images/meffec_icon.icns --name=MeffecController application.py --add-data "images:images"
+
+      - name: Upload .app
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.event.release.tag_name }}
+          files: Controller/dist/MeffecController.app
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
