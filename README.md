@@ -74,10 +74,7 @@ docker pull ghcr.io/breaktools/meffec-server
 ```
 2. Then run it using the following command, replacing the text in {curly brackets} with your own info.
 ```
-docker run -p {port}:{port} \
-  -e WEBSOCKET_TOKEN=“{your_made_up_token}” \
-  -e PORT="{port}” \
-  -t ghcr.io/breaktools/meffec-server
+docker run -p {port}:{port} -e WEBSOCKET_TOKEN="{your_made_up_token}" -e PORT="{port}" -t ghcr.io/breaktools/meffec-server
 ```
 3. Now download the right executable from the releases tab on this GitHub page, and run it. Open the preferences, select a folder and fill in the IP or address of your Meffec server, as well as the token you came up with. That's everything you need to start developing Meffec scripts! Drop your Python files into the folder you've selected and they will show up in the UI.
 4. Of course you'll also want to trigger your scripts. I haven't gotten the app on app stores yet, so for now feel free to use the identical web version over at [webbec.breaktools.info](hhttp://webbec.breaktools.info/). Go to settings and fill in your information again, after that all your scripts will show up and can be triggered with the push of a button.
