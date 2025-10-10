@@ -10,9 +10,10 @@ import json
 import logging
 import os
 
-import data_models
 import websockets
 from dotenv import load_dotenv
+
+import data_models
 
 logging.basicConfig(
     level=logging.INFO,
@@ -50,15 +51,27 @@ class QueryParameterProtocol(websockets.WebSocketServerProtocol):
         Returns:
             None if authenticated, unauthorized status if not.
         """
-        token = path.split("?token=$")[1]  # That's one way to do it...
         logger.info("Processing new connection request.")
+
+        try:
+            token = path.split("?token=$")[1]  # That's one way to do it...
+
+        except IndexError:
+            logger.warning(
+                "A client tried connecting without sending a token."
+            )
+            return (
+                http.HTTPStatus.UNAUTHORIZED,
+                [],
+                b"You did not supply a token.\n",
+            )
 
         if token != TOKEN:
             logger.warning("Unauthorized access attempt with token: %s", token)
             return (
                 http.HTTPStatus.UNAUTHORIZED,
                 [],
-                b"Invalid or missing token\n",
+                b"The token you sent is invalid.\n",
             )
 
         return None
@@ -240,7 +253,10 @@ async def forward_device_action(device_action: dict) -> None:
     )
 
     for client in server_information.connected_clients:
-        if client.type == data_models.MeffecClientType.DEVICE and client.name == device_action["device"]:
+        if (
+            client.type == data_models.MeffecClientType.DEVICE
+            and client.name == device_action["device"]
+        ):
             await client.websocket.send(
                 json.dumps(
                     {
