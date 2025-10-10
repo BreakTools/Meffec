@@ -6,6 +6,8 @@ from pathlib import Path
 from types import ModuleType
 from typing import Any, List
 
+from PySide6 import QtMultimedia
+
 import effects_handlers
 
 
@@ -78,6 +80,14 @@ class Ambiance:
 
     category: str
     audio_player: effects_handlers.FadeableAudioPlayer
+
+
+@dataclass
+class SoundEffect:
+    """Dataclass for storing the media player and output device needed for a sound effect."""
+
+    audio_player: QtMultimedia.QMediaPlayer
+    audio_output: QtMultimedia.QAudioOutput
 
 
 @dataclass

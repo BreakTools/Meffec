@@ -5,48 +5,70 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any, Callable
 
-import data_structures
 from PySide6 import QtCore, QtMultimedia
 from pythonosc.udp_client import SimpleUDPClient
+
+import data_structures
+from models import LogModel
 
 
 class AudioHandler(QtCore.QObject):
     """Class that handles all audio systems, from one-shot audio to looping ambiance sounds."""
 
-    def __init__(self) -> None:
+    def __init__(self, log_model: LogModel) -> None:
         """Initializes the audio handler."""
         super().__init__()
+        self.log_model = log_model
         self.music = FadeableAudioPlayer()
         self.ambiances = {}
         self.currently_playing = []
 
-    def play_audio(self, audio_file: Path, volume: int = 70) -> None:
-        """Single-shot plays the given audio file. Uses QSoundEffect for low latency so
-        only supports uncompressed .wavs.
+        self.media_devices = QtMultimedia.QMediaDevices()
+        self.media_devices.audioOutputsChanged.connect(
+            self._on_audio_outputs_changed
+        )
+
+    def play_audio(
+        self, audio_file: Path, volume: int = 70, audio_device_name: str = ""
+    ) -> None:
+        """Single-shot plays the given audio file.
 
         Args:
             audio_file: The audio file to one-shot play.
             volume: Volume percentage to play audio at.
+            audio_device_name: Optional audio output device to use instead of default.
         """
-        sound_effect = QtMultimedia.QSoundEffect()
-        sound_effect.setSource(QtCore.QUrl.fromLocalFile(audio_file))
-        sound_effect.setVolume(volume / 100)
-        sound_effect.play()
-        sound_effect.playingChanged.connect(
-            lambda: self.garbage_collect_audio(sound_effect)
+        sound_effect = data_structures.SoundEffect(
+            QtMultimedia.QMediaPlayer(), QtMultimedia.QAudioOutput()
+        )
+
+        if audio_device_name:
+            sound_effect.audio_output.setDevice(
+                self._find_audio_device_from_name(audio_device_name)
+            )
+            self.log_model.log(
+                f"Playing sound effect on custom audio device: {sound_effect.audio_output.device().description()}"
+            )
+
+        sound_effect.audio_output.setVolume(volume / 100)
+        sound_effect.audio_player.setAudioOutput(sound_effect.audio_output)
+        sound_effect.audio_player.setSource(
+            QtCore.QUrl.fromLocalFile(str(audio_file))
+        )
+
+        def _garbage_collect_self(
+            status: QtMultimedia.QMediaPlayer.MediaStatus,
+        ) -> None:
+            if status == QtMultimedia.QMediaPlayer.MediaStatus.EndOfMedia:
+                self.currently_playing.remove(sound_effect)
+                sound_effect.audio_output.deleteLater()
+                sound_effect.audio_player.deleteLater()
+
+        sound_effect.audio_player.mediaStatusChanged.connect(
+            _garbage_collect_self
         )
         self.currently_playing.append(sound_effect)
-
-    def garbage_collect_audio(
-        self, sound_effect: QtMultimedia.QSoundEffect
-    ) -> None:
-        """Removes the given audio from our currently playing list if it's no longer playing.
-
-        Args:
-            sound_effect: The QSoundEffect instance that finished playing.
-        """
-        if not sound_effect.isPlaying():
-            self.currently_playing.remove(sound_effect)
+        sound_effect.audio_player.play()
 
     def play_new_music(self, new_music_file: Path, volume=70) -> None:
         """Starts playing the given music.
@@ -126,6 +148,43 @@ class AudioHandler(QtCore.QObject):
         for ambiance in self.ambiances.values():
             if ambiance.category not in excepted_categories:
                 ambiance.audio_player.fade_out()
+
+    def _find_audio_device_from_name(
+        self, audio_device_name: str
+    ) -> QtMultimedia.QAudioDevice:
+        """Returns the correct audio device from the given name. Returns the default
+        audio output device if no match is found.
+
+        Args:
+            audio_device_name: The name of the device to search for.
+
+        Returns:
+            The correct audio device, or the default one if no match is found.
+        """
+        all_audio_output_devices = QtMultimedia.QMediaDevices.audioOutputs()
+
+        for audio_device in all_audio_output_devices:
+            if audio_device_name.lower() in audio_device.description().lower():
+                return audio_device
+
+        self.log_model.log(
+            f"Specified audio output device '{audio_device_name}' could not be found. Using default."
+        )
+        return QtMultimedia.QMediaDevices.defaultAudioOutput()
+
+    def _on_audio_outputs_changed(self) -> None:
+        """Ensures the music and ambiances keep playing on the default audio output
+        device if there's an update to the system's audio devices."""
+        self.log_model.log("Processing audio device changes...")
+
+        self.music.change_audio_device(
+            QtMultimedia.QMediaDevices.defaultAudioOutput()
+        )
+
+        for ambiance in self.ambiances:
+            self.ambiances[ambiance].audio_player.change_audio_device(
+                QtMultimedia.QMediaDevices.defaultAudioOutput()
+            )
 
 
 class FadeableAudioPlayer(QtCore.QObject):
@@ -304,6 +363,17 @@ class FadeableAudioPlayer(QtCore.QObject):
         self.fade_out_animation.setEndValue(0)
         self.fade_out_animation.start()
         self.fade_out_animation.finished.connect(self.currently_playing.stop)
+
+    def change_audio_device(
+        self, audio_output_device: QtMultimedia.QAudioDevice
+    ) -> None:
+        """Changes the audio device on the two audio streams to the new one.
+
+        Args:
+            audio_output_device: The new audio device to use
+        """
+        self.first_audio_output.setDevice(audio_output_device)
+        self.second_audio_output.setDevice(audio_output_device)
 
 
 class OSCHandler(QtCore.QObject):

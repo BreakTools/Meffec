@@ -61,7 +61,7 @@ class MeffecController(QtWidgets.QApplication):
         """Initializes the effects handlers and stores them in a dataclass."""
         self.script_available_classes = data_structures.ScriptAvailableClasses(
             self.log_model,
-            effects_handlers.AudioHandler(),
+            effects_handlers.AudioHandler(self.log_model),
             effects_handlers.OSCHandler(),
             effects_handlers.DeviceHandler(),
             effects_handlers.TimingHandler(),
