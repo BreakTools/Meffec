@@ -324,7 +324,11 @@ class FadeableAudioPlayer(QtCore.QObject):
         Returns:
             If we're currently playing audio.
         """
-        return self.currently_playing.isPlaying()
+        if self.currently_playing is not None:
+            return self.currently_playing.isPlaying()
+
+        else:
+            return False
 
     def pause(self, fade: bool) -> None:
         """Pauses the currently playing audio.
